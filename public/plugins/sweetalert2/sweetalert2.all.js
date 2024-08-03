@@ -571,7 +571,7 @@
   };
 
   /**
-   * Detect Node env
+   * Detect Node .env
    *
    * @returns {boolean}
    */
@@ -744,7 +744,7 @@
   };
 
   const animationEndEvent = (() => {
-    // Prevent run in Node env
+    // Prevent run in Node .env
 
     /* istanbul ignore if */
     if (isNodeEnv()) {
@@ -3175,7 +3175,7 @@
 
   class SweetAlert {
     constructor() {
-      // Prevent run in Node env
+      // Prevent run in Node .env
       if (typeof window === 'undefined') {
         return;
       }

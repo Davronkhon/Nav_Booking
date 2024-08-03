@@ -32,7 +32,7 @@
                 <td>{{$order->quantity}}</td>
                 <td>{{$order->date}}</td>
                 <td>{{$order->status}}</td>
-                <td>{{$order->booking->start_time}}</td>
+                <td>{{$order->booking->name}}</td>
                 <td>{{$order->food->name}}</td>
                 <td>{{$order->client->name}}</td>
                 <td>

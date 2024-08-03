@@ -24,7 +24,7 @@
             @enderror
 
             <label for="guests">Количество гостей</label>
-            <input type="number" class="form-control @error('guests') is-invalid @enderror" id="guests" name="guests_count" value="{{ old('guests', $booking->guests_count) }}">
+            <input type="number" class="form-control @error('guests') is-invalid @enderror" id="guests" name="guests" value="{{ old('guests', $booking->guests) }}">
             @error('guests')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror

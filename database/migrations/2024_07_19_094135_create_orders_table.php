@@ -1,37 +1,25 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateOrdersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('booking_id');
-            $table->foreign('booking_id')->references('id')->on('bookings');
-            $table->unsignedBigInteger('food_id');
-            $table->foreign('food_id')->references('id')->on('foods');
-            $table->unsignedBigInteger('client_id');
-            $table->foreign('client_id')->references('id')->on('clients');
-            $table->unsignedInteger('quantity');
-            $table->dateTime('order_datetime');
-            $table->string('status');
+            $table->unsignedBigInteger('booking_id')->nullable()->change();
+            $table->foreignId('food_id')->constrained('foods');
+            $table->decimal('price', 8, 2)->nullable();
+            $table->integer('quantity');
+            $table->decimal('total', 8, 2)->default(0);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('orders');
     }
-};
-
+}

@@ -1,73 +1,156 @@
 <?php
-
+//namespace App\Http\Controllers;
+//
+//use Illuminate\Http\Request;
+//use App\Models\Order;
+//use App\Models\Food;
+//
+//class OrderController extends Controller
+//{
+//    public function index($bookingId)
+//    {
+//        $orders = Order::where('booking_id', $bookingId)->get();
+//        $foods = Food::all();
+//
+//        return view('order.index', compact('orders', 'foods', 'bookingId'));
+//    }
+//
+//
+//
+//    public function create()
+//    {
+//        $foods = Food::all();
+//
+//        return view('order.create', compact('foods'));
+//    }
+//
+//    public function store(Request $request)
+//    {
+//        $validated = $request->validate([
+//            'booking_id' => 'required|integer',
+//            'food_id.*' => 'required|integer|exists:food,id',
+//            'quantity.*' => 'required|integer|min:0',
+//        ]);
+//
+//        $bookingId = $validated['booking_id'];
+//        $orders = Order::where('booking_id', $bookingId)->get()->keyBy('food_id');
+//
+//        foreach ($validated['food_id'] as $index => $foodId) {
+//            $quantity = $validated['quantity'][$index];
+//            $food = Food::find($foodId);
+//            $price = $food->price;
+//
+//            if (isset($orders[$foodId])) {
+//                $existingOrder = $orders[$foodId];
+//                $existingOrder->quantity = $quantity;
+//                $existingOrder->total = $price * $quantity;
+//                $existingOrder->save();
+//            } else {
+//                if ($quantity > 0) {
+//                    $total = $price * $quantity;
+//
+//                    Order::create([
+//                        'booking_id' => $bookingId,
+//                        'food_id' => $foodId,
+//                        'quantity' => $quantity,
+//                        'price' => $price,
+//                        'total' => $total
+//                    ]);
+//                }
+//            }
+//        }
+//
+//        if ($request->ajax()) {
+//            return response()->json(['message' => 'Заказ успешно сохранен']);
+//        }
+//
+//        return redirect()->back()->with('message', 'Заказ успешно сохранен!');
+//    }
+//
+//
+//    public function edit(Order $order)
+//    {
+//        $foods = Food::all();
+//
+//        return view('order.edit', compact('order', 'foods'));
+//    }
+//
+//    public function update(Request $request, Order $order)
+//    {
+//        $request->validate([
+//            'food_id' => 'required|exists:food,id',
+//            'quantity' => 'required|integer|min:0',
+//        ]);
+//
+//        $order->update($request->all());
+//
+//        return redirect()->route('order.index')->with('message', 'Order updated successfully.');
+//    }
+//
+//    public function destroy(Order $order)
+//    {
+//        $order->delete();
+//
+//        return redirect()->route('order.index')->with('message', 'Order deleted successfully.');
+//    }
+//}
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
-use App\Models\Client;
-use App\Models\Food;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Food;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index($bookingId)
     {
-        $orders = Order::with('food', 'booking')->get();
-        return view('order.index', compact('orders'));
-    }
-    public function create()
-    {
-        $orders = Order::all();
+        $orders = Order::where('booking_id', $bookingId)->get();
         $foods = Food::all();
-        $clients = Client::all();
-        $bookings = Booking::all();
 
-        return view('order.create', compact('orders', 'foods', 'clients', 'bookings'));
+        return view('order.index', compact('orders', 'foods', 'bookingId'));
     }
-    public function destroy($id)
-    {
-        $orders = Order::findOrFail($id);
-        $orders->delete();
-        return redirect('/order')->with('success', 'book');
-    }
-    public function edit($id)
-    {
-        $order = [Order::findOrFail($id), Booking::findOrFail($id), Food::findOrFail($id), Client::findOrFail($id)];
-        return view('order.edit', compact('order'));
-    }
-    public function show($id)
-    {
-        $order = Order::findOrFail($id);
-        return view('order.show', compact('order'));
-    }
+
     public function store(Request $request)
     {
-        $orders = $request->validate([
-            'quantity' => 'required|string|min:1',
-            'order_datetime' => 'required|string',
-            'status' => 'required|string',
-            'booking_id' => 'required|exists:bookings,id',
-            'food_id' => 'required|exists:foods,id',
-            'client_id' => 'required|exists:clients,id',
+
+        $validated = $request->validate([
+            'booking_id' => 'required|integer',
+            'food_id.*' => 'required|integer|exists:food,id',
+            'quantity.*' => 'required|integer|min:0',
         ]);
 
-        $request['order_datetime'] = now();
-        Order::create($orders);
-        return redirect()->route('order.index')->with('success', 'Order');
-    }
-    public function update(Request $request, $id)
-    {
-        $order = $request->validate([
-            'quantity' => 'required|integer|min:1',
-            'date' => 'required|string',
-            'status' => 'required|string',
-            'booking_id' => 'required|exists:users,id',
-            'food_id' => 'required|exists:restaurants,id',
-            'client_id' => 'required|exists:restaurants,id'
-        ]);
+        $bookingId = $validated['booking_id'];
+        $orders = Order::where('booking_id', $bookingId)->get()->keyBy('food_id');
 
-        $orders = Order::findOrFail($id);
-        $orders->update($order);
-        return redirect('/order')->with('success', 'Order');
+        foreach ($validated['food_id'] as $index => $foodId) {
+            $quantity = $validated['quantity'][$index];
+            $food = Food::find($foodId);
+            $price = $food->price;
+
+            if (isset($orders[$foodId])) {
+                $existingOrder = $orders[$foodId];
+                $existingOrder->quantity = $quantity;
+                $existingOrder->total = $price * $quantity;
+                $existingOrder->save();
+            } else {
+                if ($quantity > 0) {
+                    $total = $price * $quantity;
+
+                    Order::create([
+                        'booking_id' => $bookingId,
+                        'food_id' => $foodId,
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'total' => $total
+                    ]);
+                }
+            }
+        }
+
+        if ($request->ajax()) {
+            return response()->json(['message' => 'Заказ успешно сохранен']);
+        }
+
+        return redirect()->back()->with('message', 'Заказ успешно сохранен!');
     }
 }

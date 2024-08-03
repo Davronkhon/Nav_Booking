@@ -1,46 +1,100 @@
-@extends('layouts.app')
+\@extends('layouts.app')
 
-@section('title')
-    Добавление
-@endsection
-<!-- create -->
 @section('content')
     <div class="container">
         @if(session('message'))
             <div class="alert alert-success">
-                {{session('message')}}
+                {{ session('message') }}
             </div>
         @endif
-        <form action="{{route('order.store')}}" method="post" enctype="multipart/form-data">
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('order.store') }}" method="POST">
             @csrf
-            <label for="">Quantity : </label>
-            <input type="number" name="quantity" class="form-control">
-            <label for="">DateTime : </label>
-            <input type="datetime-local" name="order_datetime" class="form-control">
-            <label for="">Status : </label>
-            <input type="text" name="status" class="form-control">
-            <label for="">Booking_id : </label>
-            <select name="booking_id" id="" class="form-control">
-                @foreach($bookings as $booking)
-                    <option value="{{$booking->id}}">{{$booking->start_time}}</option>
-                @endforeach
-            </select>
-            <label for="">Food_id : </label>
-            <select name="food_id" id="" class="form-control">
-                @foreach($foods as $food)
-                    <option value="{{$food->id}}">{{$food->name}}</option>
-                @endforeach
-            </select>
-            <label for="">Client_id : </label>
-            <select name="client_id" id="" class="form-control">
-                @foreach($clients as $client)
-                    <option value="{{$client->id}}">{{$client->name}}</option>
-                @endforeach
-            </select><br>
-            <input type="submit" value="Добавить" class="btn btn-primary form-control">
+
+            <table class="table" id="orderTable">
+                <thead>
+                <tr>
+                    <th>Food</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <select name="food_id[]" class="form-control food-select">
+                            <option value="">Select Food</option>
+                            @foreach($foods as $food)
+                                <option value="{{ $food->id }}" data-price="{{ $food->price }}">{{ $food->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="price"></td>
+                    <td><input type="number" name="quantity[]" class="form-control quantity" value="0" min="0"></td>
+                    <td class="total"></td>
+                    <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <button type="button" class="btn btn-primary" id="addRow">Add Row</button>
+            <button type="submit" class="btn btn-success">Save</button>
         </form>
     </div>
-@endsection
 
-@section('footer')
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <script>
+        $(document).ready(function() {
+            $('.food-select').select2({
+                placeholder: "Select Food",
+                allowClear: true
+            });
+
+            function updateRow(row) {
+                const price = parseFloat(row.find('.food-select option:selected').data('price') || 0);
+                const quantity = parseInt(row.find('.quantity').val() || 0);
+                const total = price * quantity;
+                row.find('.price').text(price.toFixed(2));
+                row.find('.total').text(total.toFixed(2));
+            }
+
+            $('#orderTable').on('change', '.food-select, .quantity', function() {
+                const row = $(this).closest('tr');
+                updateRow(row);
+            });
+
+            $('#addRow').click(function() {
+                const newRow = $('#orderTable tbody tr:first').clone();
+                newRow.find('select').select2({
+                    placeholder: "Select Food",
+                    allowClear: true
+                }).val('').trigger('change');
+                newRow.find('.price, .total').text('');
+                newRow.find('.quantity').val(0);
+                $('#orderTable tbody').append(newRow);
+            });
+
+            $('#orderTable').on('click', '.remove-row', function() {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
 @endsection
