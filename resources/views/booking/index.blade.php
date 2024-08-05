@@ -27,6 +27,7 @@
             <th>Клиент</th>
             <th>Удалить</th>
             <th>Изменить</th>
+            <th>Добавить заказ</th>
         </tr>
         </thead>
         <tbody>
@@ -35,7 +36,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $booking->start_time }}</td>
                 <td>{{ $booking->end_time }}</td>
-                <td>{{ $booking->guests_count}}</td>
+                <td>{{ $booking->guests }}</td>
                 <td>{{ $booking->status }}</td>
                 <td>{{ $booking->place->name }}</td>
                 <td>{{ $booking->client->name }}</td>
@@ -49,6 +50,8 @@
                 <td>
                     <a href="{{ route('booking.edit', $booking->id) }}" class="btn btn-info">Изменить</a>
                 </td>
+                <td><a href="{{ route('order.add', ['booking_id' => $booking->id]) }}" class="btn btn-primary">Добавить Продукт</a></td>
+
             </tr>
         @endforeach
         </tbody>

@@ -8,18 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-    protected $fillable = ['booking_id', 'food_id', 'client_id', 'quantity', 'order_datetime', 'status'];
 
-    public function booking()
-    {
-        return $this->belongsTo(Booking::class, 'booking_id');
-    }
+    protected $fillable = ['booking_id', 'food_id', 'quantity', 'price', 'total'];
+
+
     public function food()
     {
-        return $this->belongsTo(Food::class, 'food_id');
+        return $this->belongsTo(Food::class);
     }
-    public function client()
+    public function booking()
     {
-        return $this->belongsTo(Client::class, 'client_id');
+        return $this->belongsTo(Booking::class);
     }
 }

@@ -12,7 +12,7 @@
         <label for="">User:</label>
         <select name="user_id" class="form-control">
             @foreach($users as $user)
-                <option value="{{$user->id}}">{{$user->name}}</option>
+                <option value="{{$user->id}}">{{$user->username}}</option>
             @endforeach
         </select>
         <label for="">Restaurant:</label>

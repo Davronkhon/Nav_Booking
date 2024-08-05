@@ -35,7 +35,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $booking->start_time }}</td>
                 <td>{{ $booking->end_time }}</td>
-                <td>{{ $booking->guests_count}}</td>
+                <td>{{ $booking->guests }}</td>
                 <td>{{ $booking->status }}</td>
                 <td>{{ $booking->place->name }}</td>
                 <td>{{ $booking->client->name }}</td>
